@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+
+<head>
+    {% if title %}
+        <title>{{ title }}</title>
+    {% else %}
+        <title>Flask library</title>
+    {% endif %}
+
+    <link rel="stylesheet" href="{{ url_for('static', filename="css/bootstrap.min.css") }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename="css/style.css") }}">
+</head>
+<body>
+<div class="navbar navbar-inverse navbar-top">
+    <div class="container">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="/">Home</a>
+        </div>
+        <div class="navbar-collapse">
+            <ul class="nav navbar-nav">
+                {% if not is_authenticated%}
+                <li><a href="/register/">Registration</a></li>
+                {% endif %}
+                {% if is_authenticated %}
+                <li><a href="/books/">List of books</a></li>
+                <li><a href="/authors/">List of authors</a></li>
+                <li><a href="/random">Random page</a></li>
+                {% endif %}
+                
+            </ul>
+
+            {% if is_authenticated %}
+                <div class="navbar-right navbar-text">{{ user.email }} <a href="/logout" class="btn btn-default">Logout</a></div>
+            {% else %}
+            <form class="navbar-form navbar-right" action="/login" method="post" name="login">
+                {{ form.hidden_tag() }}
+                <div class="form-group">
+                    {{ form.email(class_="form-control", placeholder = 'email') }}
+                </div>
+                <div class="form-group">
+                    {{ form.password(class_="form-control", placeholder = 'password') }}
+                </div>
+                <input type="submit" class="btn btn-success" value="Sign in" action="/login">
+              
+            </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
+<div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    
+    <br>
+    {% block content %}
+    {% endblock %}
+</div>
+</body>
+

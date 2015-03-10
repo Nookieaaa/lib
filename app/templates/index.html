@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% block content %}
+    <form class="inline" action="/search/" method="post" name="search">
+        {{ form_s.hidden_tag() }}
+        {% if form_s.errors %}
+                {% for field_name, field_errors in form_s.errors|dictsort if field_errors %}
+                    {% for error in field_errors %}
+                        <div class="alert alert-danger">{{ form_s[field_name].label }}: {{ error }}</div>
+                    {% endfor %}
+                {% endfor %}
+        {% endif %}
+        
+      <div class="col-lg-6">
+        <div class="input-group">
+          {{ form_s.search(type ="text",class_="form-control", placeholder="enter your request here") }} 
+          <span class="input-group-btn">
+           <button class="btn btn-default" type="button">Go!</button>
+          </span>
+          </div>
+        </div>
+      </div>
+
+    </form>
+    <br>
+
+
+      <div class="container">
+        <div class="row">
+          <div class="col-md-6">
+          <h2>Books</h2>
+          <a href="/book_add/" class="btn btn-large btn-info">add a book <span class="glyphicon glyphicon-add"></span></a>
+          {% if books %}
+
+            <ul class = "list-group">
+
+            {% for book in books%}
+              <li type="list-group-item" class="text" data-toggle="collapse" data-target="#book{{book.id}}" ><h3><a href="#">{{book.title}}</a></h3></li>
+              <div id="book{{book.id}}" class="collapse out">
+                <form class="" action="/book/{{ book.id }}" method="post" name="book_edit">
+                    <div class="form-group">
+
+                      {% if book.authors %}
+                        <div class = "row-md-6">
+                          <ul> <b>Authors:</b>
+                          {%for author in book.authors%}
+                            <li>
+                              {% if is_authenticated %}
+                                <a href = "/author/{{author.id}}">{{author.name}}</a>
+                              {% else %}
+                               {{author.name}}
+                              {% endif %}
+                            </li>
+                          {% endfor%}
+                          </ul>
+                        </div>
+                      {% else%}
+                        No information about authors
+                      {%endif%}
+
+                    </div>
+
+                    {% if is_authenticated %}
+                      <a href="/book/{{book.id}}" class="btn btn-large btn-info">Edit book <span class="glyphicon glyphicon-edit">
+                    {% endif %}
+                      </span></a>
+                    
+                    
+                </form>
+              </div>
+            {% endfor%}
+            {% endif %}
+            </ul>
+          </div>
+          <div class="col-md-6">
+          <h2>Authors</h2>
+          <a href="/book_add/" class="btn btn-large btn-info">add an author <span class="glyphicon glyphicon-add"></span></a>
+            {% if authors %}
+            <ul class = "list-group">
+            {% for author in authors%}
+              <li type="list-group-item" class="text" data-toggle="collapse" data-target="#author{{author.id}}" ><h3>
+                <a href = "#">{{author.name}}</a>
+              </h3></li>
+              <div id="author{{author.id}}" class="collapse out">
+                <form class="" action="/author/{{ author.id }}" method="post" name="author_edit">
+                    <div class="form-group">
+
+                      {% if author.books %}
+                        <div class = "row-md-6">
+                          <ul><b>Books:</b>
+                          {%for book in author.books%}
+                          <li>
+                          {% if is_authenticated %}
+                            <a href = "/book/{{book.id}}">{{book.title}}</a>
+                          {% else %}
+                            {{book.title}}
+                          {% endif %}
+                          </li>
+                          {% endfor%}
+                          </ul>
+                        </div>
+                      {% else%}
+                        No information about written books
+                      {%endif%}
+
+                    </div>
+
+                    {% if is_authenticated %}
+                      <a href="/author/{{author.id}}" class="btn btn-large btn-info">Edit author <span class="glyphicon glyphicon-edit"></span></a>
+                    {%endif%}
+                </form>
+              </div>
+            {% endfor%}
+            {% endif %}
+            </ul>
+          </div>
+          </div>  
+        </div>
+
+
+
+    <script src="{{url_for('static',filename="js/jquery.min.js")}}"></script>
+    <script src="{{url_for('static',filename="js/bootstrap.min.js")}}"></script>
+{% endblock %}
