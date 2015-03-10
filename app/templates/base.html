@@ -33,7 +33,6 @@
                 <div class="navbar-right navbar-text">{{ user.email }} <a href="/logout" class="btn btn-default">Logout</a></div>
             {% else %}
             <form class="navbar-form navbar-right" action="/login" method="post" name="login">
-                {{ form.hidden_tag() }}
                 <div class="form-group">
                     {{ form.email(class_="form-control", placeholder = 'email') }}
                 </div>
