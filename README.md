@@ -1,3 +1,1 @@
-# lib
-python db_create.py #to create a db
-python run.py
+first учусгеу "db_create.py" to create and fill db, then "run.py"
