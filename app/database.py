@@ -27,7 +27,7 @@ def fill_db():
      for insert_line in sql_file.readlines():
        engine.execute(insert_line)
   
-if config.HEROKU:
+if config.HEROKU and "lib.db" not in config.SQLALCHEMY_DATABASE_URI:
   init_db()
   fill_db()
 
