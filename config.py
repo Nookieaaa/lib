@@ -11,3 +11,4 @@ if os.environ.get('DATABASE_URL') is None:
 else:
     SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
 
+HEROKU = os.environ.get('HEROKU') is None

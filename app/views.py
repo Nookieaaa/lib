@@ -32,7 +32,7 @@ def register_view():
       user.set_password(form.password.data)
       db_session.add(user)
       db_session.commit()
-      flash('User %s created succesfully' %(user.email))
+      flash('User %s created succesfully' %(user.email),'success')
       if current_user.is_authenticated():
           logout_user()
       login_user(user)
