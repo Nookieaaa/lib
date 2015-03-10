@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, Table, ForeignKey
 from sqlalchemy.orm import relationship
 from database import Base
+import hashlib
 
 
 class User(Base):
@@ -8,7 +9,8 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(50), unique=True)
     email = Column(String(120), unique=True)
-    password = Column(String(32))
+    password = Column(String(100))
+
 
     def is_authenticated(self):
         return True
@@ -27,7 +29,22 @@ class User(Base):
     def __init__(self, name=None, email=None, password=None):
         self.name = name
         self.email = email
-        self.password = password
+        if password:
+            self.set_password(password)
+
+
+
+    def set_password(self, password):
+        hash_object = hashlib.md5(password.encode())
+
+        self.password = hash_object.hexdigest()
+
+    def check_password(self, password):
+        hash_object = hashlib.md5(password.encode())
+        hash_pw = hash_object.hexdigest()
+        return str(hash_pw) == self.password
+
+ 
 
     def __repr__(self):
         return '<User %r>' % self.name

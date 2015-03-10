@@ -7,7 +7,7 @@ app.config.from_object('config')
 lm = LoginManager()
 lm.init_app(app)
 
-from database import DB_session
+from database import db_session
 from app import views, models
 
 

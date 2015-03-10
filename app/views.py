@@ -24,14 +24,14 @@ def register_view():
     flash('sorry, registration is available only for not-authorised users')
     return redirect(url_for('index'))
   form_r = RegistrationForm()
-  form=LoginForm
+  form=LoginForm()
   if form_r.validate_on_submit() and form_r.validate_login():
       user = User()
       user.name = form_r.name.data
       user.email = form_r.email.data
-      user.password = form_r.password.data
-      DB_session.add(user)
-      DB_session.commit()
+      user.set_password(form.password.data)
+      db_session.add(user)
+      db_session.commit()
       flash('User %s created succesfully' %(user.email))
       if current_user.is_authenticated():
           logout_user()
@@ -39,20 +39,19 @@ def register_view():
       return redirect(url_for('index'))
   return render_template('register.html',form = form, form_r=form_r, user=current_user, is_authenticated=current_user.is_authenticated())
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/login/', methods=['GET', 'POST'])
 def login():
   form = LoginForm()
   if form.validate_on_submit():
       user = form.get_user()
-      if user and user.password == form.password.data:#####!!!!!
+      if user and user.check_password(form.password.data):
         login_user(user)
         flash('Welcome ' + user.email, 'success')
         return redirect(request.args.get("next") or url_for("index"))
       else:
         flash('wrong username or password', 'danger')
         return redirect(url_for("login"))
-  flash('incorrect data','danger')
-  return redirect(url_for("index"))
+  return render_template("login.html", form=form)
 
 
 @login_required
@@ -66,18 +65,18 @@ def logout():
 ##                                   index/Search
 @app.route('/',methods=('GET', 'POST'))
 def index():
-    form = LoginForm()
+
     form_s = SearchForm()
     books = db_session.query(Book).all()
     authors = db_session.query(Author).all()
 
 
-    return render_template("index.html", form=form,authors = authors, user=current_user, is_authenticated=current_user.is_authenticated(), books=books, form_s=form_s)
+    return render_template("index.html", authors = authors, user=current_user, is_authenticated=current_user.is_authenticated(), books=books, form_s=form_s)
 
 
 @app.route("/search/", methods=('GET', 'POST'))
 def search():
-  form = LoginForm()
+
   form_s = SearchForm()
   if form_s.validate_on_submit():
     books = Book.query.all()
@@ -96,7 +95,7 @@ def search():
           if not b in result_books:
             result_books.append(b)
     flash("found %s book(s) and %s author(s)" %(len(result_books),len(result_authors)), 'info')
-    return render_template('index.html', books=result_books, authors = result_authors, form=form, user=current_user,
+    return render_template('index.html', books=result_books, authors = result_authors, user=current_user,
                          is_authenticated=current_user.is_authenticated(), form_s=form_s)
 
   return redirect(url_for('index'))
@@ -115,9 +114,9 @@ def book():
 @app.route('/book_add/', methods=['GET', 'POST'])
 @login_required
 def book_add():
-  form = LoginForm()
+
   book_form = BookForm(request.form)
-  book_form.authors.choices = [(p.id, p.name) for p in DB_session.query(Author).order_by('id')]
+  book_form.authors.choices = [(p.id, p.name) for p in db_session.query(Author).order_by('id')]
 
   if book_form.validate_on_submit():
       book = Book()
@@ -128,18 +127,18 @@ def book_add():
       flash('Successfully added.', 'success')
       return redirect(url_for('index'))
 
-  return render_template("book_create.html", bform=book_form, form=form, user=current_user, is_authenticated=current_user.is_authenticated())
+  return render_template("book_create.html", bform=book_form, user=current_user, is_authenticated=current_user.is_authenticated())
 
 @app.route('/book/<id>', methods=['GET', 'POST'])
 @login_required
 def book_edit(id):
-  form = LoginForm()
+
   book = db_session.query(Book).get(id)
   book_form = BookForm(request.form, obj=book)
   book_form.authors.choices = [(p.id, p.name) for p in db_session.query(Author).order_by('id')]
 
   if book_form.validate_on_submit():
-      book = DB_session.query(Book).get(id)
+      book = db_session.query(Book).get(id)
       book.title = book_form.title.data
       book.authors = [db_session.query(Author).get(o) for o in book_form.authors.data]
       db_session.commit()
@@ -147,7 +146,7 @@ def book_edit(id):
       return redirect(url_for('index'))
 
   book_form.authors.data = [p.id for p in book.authors]
-  return render_template("book.html", bform=book_form, form=form, book=book, user=current_user, is_authenticated=current_user.is_authenticated())
+  return render_template("book.html", bform=book_form, book=book, user=current_user, is_authenticated=current_user.is_authenticated())
 
 
 @app.route('/book_rm/<id>', methods=['GET', 'POST'])
@@ -167,15 +166,15 @@ def book_rm(id):
 @app.route('/authors/')
 @login_required
 def author():
-  form = LoginForm()
+
   authors = db_session.query(Author).all()
-  return render_template("authors.html", form=form, user=current_user, is_authenticated=current_user.is_authenticated(), authors=authors)
+  return render_template("authors.html", user=current_user, is_authenticated=current_user.is_authenticated(), authors=authors)
 
 
 @app.route('/author/<id>', methods=['GET', 'POST'])
 @login_required
 def author_edit(id):
-  form = LoginForm()
+
   author = db_session.query(Author).get(id)
   author_form = AuthorForm(request.form, obj=author)
   author_form.books.choices = [(b.id, b.title) for b in db_session.query(Book).order_by('id')]
@@ -189,13 +188,12 @@ def author_edit(id):
       return redirect(url_for('index'))
 
   author_form.books.data = [auth.id for auth in author.books]
-  return render_template("author.html", bform=author_form, form=form, author=author, user=current_user, is_authenticated=current_user.is_authenticated())
+  return render_template("author.html", bform=author_form, author=author, user=current_user, is_authenticated=current_user.is_authenticated())
 
 
 @app.route('/author_add/', methods=['GET', 'POST'])
 @login_required
 def author_add():
-  form = LoginForm()
   author_form = AuthorForm(request.form)
   author_form.books.choices = [(p.id, p.title) for p in db_session.query(Book).order_by('id')]
 
@@ -208,7 +206,7 @@ def author_add():
       flash('Successfully added.', 'success')
       return redirect(url_for('index'))
 
-  return render_template("author_create.html", bform=author_form, form=form, user=current_user, is_authenticated=current_user.is_authenticated())
+  return render_template("author_create.html", bform=author_form, user=current_user, is_authenticated=current_user.is_authenticated())
 
 
 @app.route('/author_rm/<id>', methods=['GET', 'POST'])

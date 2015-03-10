@@ -11,7 +11,7 @@ engine = create_engine(config.SQLALCHEMY_DATABASE_URI, echo=config.DEBUG,convert
 db_session = scoped_session(sessionmaker(bind=engine))
 
 Base = declarative_base()
-Base.query = DB_session.query_property()
+Base.query = db_session.query_property()
 
 
 def init_db():

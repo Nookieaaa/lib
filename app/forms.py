@@ -3,7 +3,7 @@ from flask.ext.wtf import Form
 from wtforms import TextField, PasswordField, SelectMultipleField, widgets
 from wtforms.validators import Required, Length
 from app.models import User
-from database import DB_session
+from database import db_session
 from wtforms import validators
 
 
@@ -12,9 +12,9 @@ class LoginForm(Form):
     password = PasswordField('password', validators=[validators.required()])
 
     def get_user(self):
-        usr = DB_session.query(User).filter_by(email=self.email.data).first()
+        usr = db_session.query(User).filter_by(email=self.email.data).first()
         if not usr:
-            usr = DB_session.query(User).filter_by(name=self.email.data).first()
+            usr = db_session.query(User).filter_by(name=self.email.data).first()
         return usr
 
 class BookForm(Form):
@@ -35,10 +35,10 @@ class RegistrationForm(Form):
     password = PasswordField('password', validators=[validators.required(), Length(max=32)])
 
     def validate_login(self):
-        if DB_session.query(User).filter_by(email=self.email.data).count() > 0:
+        if db_session.query(User).filter_by(email=self.email.data).count() > 0:
             flash('Email is already registered', 'danger')
             return False
-        if DB_session.query(User).filter_by(name=self.name.data).count() > 0:
+        if db_session.query(User).filter_by(name=self.name.data).count() > 0:
             flash('Name is already in use', 'danger')
             return False
         return True

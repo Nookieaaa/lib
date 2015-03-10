@@ -3,7 +3,8 @@ CREATE TABLE users (
   id INTEGER NOT NULL,
   name VARCHAR(50),
   email VARCHAR(120),
-  password VARCHAR(32),
+  password VARCHAR(100),
+
   PRIMARY KEY (id),
   UNIQUE (name),
   UNIQUE (email)

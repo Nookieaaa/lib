@@ -1,13 +1,25 @@
-<!-- extend from base layout -->
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Sign In</h1>
-<form action="" method="post" name="login">
-    {{form.hidden_tag()}}
-    <p>
-        login:{{form.email(size=50)}}   password:{{form.password(size=30)}}<br>
-    </p>
-    <p><input type="submit" value="Sign In"></p>
-</form>
+    {% if not is_authenticated %}
+    <form class="" action="/login/" method="post" name="login">
+        {{ form.hidden_tag() }}
+        {% if form.errors %}
+                {% for field_name, field_errors in form.errors|dictsort if field_errors %}
+                    {% for error in field_errors %}
+                        <div class="alert alert-danger">{{ form[field_name].label }}: {{ error }}</div>
+                    {% endfor %}
+                {% endfor %}
+        {% endif %}
+
+
+        <label>Email</label>
+        {{ form.email(class_="form-control") }}
+        <label>Password</label>
+        {{ form.password(class_="form-control") }}
+        <br>
+
+        <input type="submit" class="btn btn-success" value="Sign in">
+    </form>
+    {% endif %}
 {% endblock %}
