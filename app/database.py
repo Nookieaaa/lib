@@ -29,5 +29,5 @@ def fill_db():
   
 if config.HEROKU and "lib.db" not in config.SQLALCHEMY_DATABASE_URI:
   init_db()
-  fill_db()
+#  fill_db()
 
