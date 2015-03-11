@@ -5,5 +5,4 @@ def main():
   database.fill_db()
 
 
-if __name__ == "__main__":
   main()
