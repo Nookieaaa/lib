@@ -29,7 +29,7 @@ def register_view():
       user = User()
       user.name = form_r.name.data
       user.email = form_r.email.data
-      user.set_password(form.password.data)
+      user.set_password(form_r.password.data)
       db_session.add(user)
       db_session.commit()
       flash('User %s created succesfully' %(user.email),'success')
